@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>woy 24</title>
+    <title>Gazebo Architect - SNI Compliant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Font Modern Geometris -->
@@ -149,11 +149,11 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-3 cursor-pointer">
-                    <div class="">
-                        <i class=""></i>
+                    <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg text-white border border-blue-400/30">
+                        <i class="fas fa-city text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-white tracking-wide">Bikin<span class="font-light text-blue-400">Gazebo</span></h1>
+                        <h1 class="text-xl font-bold text-white tracking-wide">Gazebo<span class="font-light text-blue-400">Pro</span></h1>
                     </div>
                 </div>
                 <button onclick="app.resetData()" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-xs font-bold uppercase transition-all flex items-center gap-2">
@@ -225,12 +225,12 @@
                                     <option value="kayu_meranti">Kayu Meranti (Ekonomis)</option>
                                 </optgroup>
                                 <optgroup label="Logam (Modern)">
-                                    <option value="besi_hollow">Besi Hollow Galvanis</option>
-                                    <option value="pipa_galvanis">Pipa Galvanis Medium</option>
+                                    <option value="besi_hollow">Besi Hollow Galvanis (Analisa kg)</option>
+                                    <option value="pipa_galvanis">Pipa Galvanis Medium (Analisa kg)</option>
                                     <option value="baja_wf">Baja WF (Konstruksi Berat)</option>
                                 </optgroup>
                                 <optgroup label="Lainnya">
-                                    <option value="beton_k250">Beton Bertulang K-250</option>
+                                    <option value="beton_bertulang">Beton Bertulang K-225</option>
                                 </optgroup>
                             </select>
                         </div>
@@ -313,7 +313,7 @@
                 <!-- Print Header -->
                 <div class="print-only border-b-2 border-slate-800 mb-6 pb-4">
                     <h1 class="text-3xl font-bold text-slate-800">Rencana Anggaran Biaya</h1>
-                    <p class="text-slate-600">Gazebo Project Estimation (Standar PU)</p>
+                    <p class="text-slate-600">Gazebo Project Estimation (Standar PU & SNI)</p>
                     <p class="text-xs mt-2 text-slate-400" id="print-date"></p>
                 </div>
 
@@ -391,54 +391,150 @@
 <script>
 // --- CORE LOGIC ---
 const defaultPrices = {
-    // Material Struktur (Sesuai Dokumen PU)
+    // Material Struktur (Sesuai Dokumen PU Balikpapan)
     'kayu_ulin': { name: 'Kayu Ulin (Balok)', unit: 'm3', price: 6760000, source: 'Std PU' },
     'kayu_bangkirai': { name: 'Kayu Bangkirai (Balok)', unit: 'm3', price: 6240000, source: 'Std PU' },
     'kayu_meranti': { name: 'Kayu Meranti (Balok)', unit: 'm3', price: 2756000, source: 'Std PU' },
     'papan_ulin': { name: 'Papan Ulin', unit: 'm3', price: 6240000, source: 'Std PU' },
-    'besi_hollow': { name: 'Besi Hollow 40x60 t.1mm', unit: 'btg', price: 147200, source: 'Std PU' },
-    'pipa_galvanis': { name: 'Pipa Galvanis 3"', unit: 'btg', price: 1171500, source: 'Std PU' },
+    
+    // Besi & Logam (Harga Konversi ke KG untuk SNI)
+    // Harga batang: Besi Hollow 40x60 = 147.200 (Std PU). Berat per btg 6m approx 9kg -> 16.355/kg
+    'besi_hollow': { name: 'Besi Hollow/Profil', unit: 'kg', price: 16355, source: 'Std PU (Konversi)' }, 
+    // Pipa Galvanis 3" = 1.171.500 (Std PU). Berat approx 30kg/btg -> 39.050/kg
+    'pipa_galvanis': { name: 'Pipa Galvanis', unit: 'kg', price: 39050, source: 'Std PU (Konversi)' },
     'baja_wf': { name: 'Baja WF Profil', unit: 'kg', price: 16026, source: 'Std PU' },
-    'beton_k250': { name: 'Beton Ready Mix K-250', unit: 'm3', price: 1558254, source: 'Std PU' },
     
     // Atap
-    'sirap': { name: 'Atap Sirap Ulin', unit: 'm2', price: 64400, source: 'Est (80bh/m2 x 805)' }, // 805/bh x 80
+    'sirap': { name: 'Atap Sirap Ulin', unit: 'm2', price: 64400, source: 'Est (80bh/m2 x 805)' }, 
     'genteng_keramik': { name: 'Genteng Keramik Glazur', unit: 'bh', price: 16480, source: 'Std PU (Kanmuri)' },
     'genteng_metal': { name: 'Genteng Metal (Sakura Roof)', unit: 'lbr', price: 116523, source: 'Std PU' },
     'seng_gelombang': { name: 'Seng Gelombang BJLS 30', unit: 'lbr', price: 77682, source: 'Std PU' },
     'atap_onduline': { name: 'Atap Onduline', unit: 'lbr', price: 197248, source: 'Std PU' },
     
-    // Lantai (Disesuaikan dengan PDF)
+    // Lantai
     'granit_60': { name: 'Granit Tile 60x60', unit: 'm2', price: 345565, source: 'Std PU (Indogress)' },
     'keramik_40': { name: 'Keramik 40x40', unit: 'm2', price: 60500, source: 'Std PU (Mulia)' },
     'keramik_30': { name: 'Keramik 30x30 Rustic', unit: 'm2', price: 63250, source: 'Std PU (Asia)' },
-    'plester_aci': { name: 'Rabat Beton + Acian', unit: 'm2', price: 171700, source: 'Std PU' },
     
-    // -- LANTAI MURAH (BARU) --
-    'lantai_papan_meranti': { name: 'Papan Meranti (2.5cm)', unit: 'm2', price: 72800, source: 'Est (2.5cm x 2.9jt/m3)' },
+    // -- LANTAI MURAH --
+    'papan_meranti': { name: 'Papan Meranti', unit: 'm3', price: 2912000, source: 'Std PU (X.3.5.15)' },
     'lantai_vinyl': { name: 'Lantai Kayu Vinyl Selgrid', unit: 'm2', price: 231000, source: 'Std PU (X.3.10.4.1.54)' },
-    'lantai_paving': { name: 'Paving Block Abu (6cm)', unit: 'm2', price: 121805, source: 'Std PU (48bh/m2 x 2.537)' },
+    'paving_block': { name: 'Paving Block Abu (6cm)', unit: 'bh', price: 2537, source: 'Std PU (X.3.10.5.13)' },
 
-    // Pendukung
+    // Pendukung & Auxiliary SNI
     'paku': { name: 'Paku Biasa', unit: 'kg', price: 27122, source: 'Std PU' },
     'baut': { name: 'Baut/Mur', unit: 'psg', price: 3300, source: 'Std PU' },
     'semen': { name: 'Semen PC (50kg)', unit: 'zak', price: 68480, source: 'Std PU (Gresik)' },
+    'semen_kg': { name: 'Semen PC', unit: 'kg', price: 1370, source: 'Std PU (Konversi 50kg)' },
     'pasir': { name: 'Pasir Beton', unit: 'm3', price: 428800, source: 'Std PU' },
+    'pasir_urug': { name: 'Pasir Urug', unit: 'm3', price: 160800, source: 'Std PU' },
+    'kerikil': { name: 'Kerikil/Split', unit: 'm3', price: 484000, source: 'Std PU (Sungai Lokal)' },
     'cat_kayu': { name: 'Cat Kayu Synthetic', unit: 'kg', price: 89200, source: 'Std PU' },
     'cat_besi': { name: 'Cat Besi/Anti Karat', unit: 'kg', price: 66936, source: 'Std PU' },
     'las': { name: 'Kawat Las', unit: 'dos', price: 194040, source: 'Std PU' },
-    'bekisting': { name: 'Papan Bekisting (Meranti)', unit: 'm3', price: 2251200, source: 'Std PU' }, // Menggunakan harga papan meranti
+    'bekisting': { name: 'Papan Bekisting (Meranti)', unit: 'm3', price: 2251200, source: 'Std PU' }, 
+    'lem_kuning': { name: 'Lem Vinyl/Kuning', unit: 'kg', price: 65000, source: 'Est' },
 
     // Upah (Std PU)
     'tukang': { name: 'Tukang', unit: 'OH', price: 129800, source: 'Std PU' },
     'pekerja': { name: 'Pekerja Terampil', unit: 'OH', price: 121600, source: 'Std PU' },
-    'mandor': { name: 'Mandor', unit: 'OH', price: 137800, source: 'Std PU' }
+    'mandor': { name: 'Mandor', unit: 'OH', price: 137800, source: 'Std PU' },
+    'kepala_tukang': { name: 'Kepala Tukang', unit: 'OH', price: 145900, source: 'Std PU' }
+};
+
+// SNI Analysis Templates (Koefisien)
+const SNI_ANALYSIS = {
+    'beton_bertulang': {
+        unit: 'm3',
+        labor: { pekerja: 2.0, tukang: 0.35, kepala: 0.035, mandor: 0.1 },
+        materials: [ 
+            { id: 'semen_kg', coef: 336 }, 
+            { id: 'pasir', coef: 0.54 }, 
+            { id: 'kerikil', coef: 0.81 }, 
+            { id: 'bekisting', coef: 10 }, // 10 m2 bekisting/m3 beton (est) - pake harga m3 papan = 10*0.02 = 0.2
+            { id: 'paku', coef: 4.0 },
+            { id: 'baja_wf', coef: 110 } // Besi beton (kg)
+        ]
+    },
+    'pondasi_umpak': {
+        unit: 'm3',
+        labor: { pekerja: 1.65, tukang: 0.275, kepala: 0.028, mandor: 0.083 },
+        materials: [
+            { id: 'semen_kg', coef: 326 },
+            { id: 'pasir', coef: 0.52 },
+            { id: 'kerikil', coef: 0.78 },
+            { id: 'bekisting', coef: 5 }, // 5m2 bekisting/m3 -> 0.1 m3 papan
+            { id: 'paku', coef: 1.5 }
+        ]
+    },
+    'rangka_besi': {
+        unit: 'kg',
+        labor: { pekerja: 0.06, tukang: 0.06, kepala: 0.006, mandor: 0.003 },
+        materials: [
+            { id: 'las', coef: 0.04 }, // Elektroda
+            { id: 'cat_besi', coef: 0.035 }
+        ]
+    },
+    'rangka_kayu': {
+        unit: 'm3',
+        labor: { pekerja: 4.0, tukang: 12.0, kepala: 1.2, mandor: 0.2 },
+        materials: [
+            { id: 'baut', coef: 15 },
+            { id: 'paku', coef: 5.6 },
+            { id: 'cat_kayu', coef: 3.5 } // Finishing
+        ]
+    },
+    'atap_genteng_keramik': {
+        unit: 'm2',
+        labor: { pekerja: 0.15, tukang: 0.075, kepala: 0.008, mandor: 0.008 },
+        materials: [ { id: 'genteng_keramik', coef: 14 } ] // 14 bh/m2
+    },
+    'atap_seng': {
+        unit: 'm2',
+        labor: { pekerja: 0.12, tukang: 0.06, kepala: 0.006, mandor: 0.006 },
+        materials: [ 
+            { id: 'seng_gelombang', coef: 1.2 }, // Overlap 20%
+            { id: 'paku', coef: 0.04 }
+        ]
+    },
+    'lantai_keramik': {
+        unit: 'm2',
+        labor: { pekerja: 0.7, tukang: 0.35, kepala: 0.035, mandor: 0.035 },
+        materials: [
+            { id: 'semen_kg', coef: 10 },
+            { id: 'pasir', coef: 0.045 }
+        ]
+    },
+    'lantai_paving': {
+        unit: 'm2',
+        labor: { pekerja: 0.5, tukang: 0.25, kepala: 0.025, mandor: 0.025 },
+        materials: [
+            { id: 'paving_block', coef: 48 }, // 48 bh/m2
+            { id: 'pasir_urug', coef: 0.1 } // 10cm sand bedding
+        ]
+    },
+    'lantai_kayu': {
+        unit: 'm2',
+        labor: { pekerja: 0.6, tukang: 1.5, kepala: 0.15, mandor: 0.03 },
+        materials: [
+            { id: 'papan_meranti', coef: 0.03 }, // Tebal 2.5cm + waste
+            { id: 'paku', coef: 0.3 },
+            { id: 'cat_kayu', coef: 0.4 }
+        ]
+    },
+    'lantai_vinyl': {
+        unit: 'm2',
+        labor: { pekerja: 0.3, tukang: 0.45, kepala: 0.045, mandor: 0.015 },
+        materials: [
+            { id: 'lantai_vinyl', coef: 1.05 }, // 5% waste
+            { id: 'lem_kuning', coef: 0.35 }
+        ]
+    }
 };
 
 const savedPrices = JSON.parse(localStorage.getItem('gazebo_prices')) || {};
 let prices = { ...defaultPrices, ...savedPrices };
 
-// UI Object defined FIRST to fix ReferenceError
 const ui = {
     fmt: (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n),
     switchTab: (t) => {
@@ -499,7 +595,6 @@ const ui = {
     }
 };
 
-// App Object defined SECOND
 const app = {
     currentGeom: {},
 
@@ -651,112 +746,123 @@ const app = {
         
         const items = [];
 
-        const addItem = (title, vol, unit, mainMatKey, mainMatCoef, laborCoef, auxList) => {
+        // Helper to get AHSP
+        const getAnalysis = (key, volume, mainMatKey) => {
+            const template = SNI_ANALYSIS[key];
+            if (!template) return null;
+            
             const matPrice = prices[mainMatKey] || { price: 0, name: mainMatKey, unit: '-' };
             const tukang = prices['tukang'];
             const pekerja = prices['pekerja'];
             const mandor = prices['mandor'];
+            const kepala = prices['kepala_tukang'];
 
-            const baseCost = matPrice.price * mainMatCoef;
-            const wasteCost = baseCost * wastage;
-            const mainTotal = baseCost + wasteCost;
-
-            let auxTotal = 0;
-            const auxDetails = auxList.map(aux => {
-                const p = prices[aux.key] || { price: 0, name: aux.key, unit: '-' };
-                const cost = p.price * aux.coef;
-                auxTotal += cost;
-                return { name: p.name, unit: p.unit, price: p.price, coef: aux.coef, total: cost };
+            // Main Material Cost
+            // If mainMatKey exists in materials array of template, use coef from template.
+            // Otherwise assume coef = 1.0 (or adjust based on volume logic)
+            let mainMatCoef = 1.0;
+            // Check if mainMat is already in aux list of template, if so use that coef
+            // For simplicity, we treat the 'mainMatKey' passed as the primary material. 
+            // BUT for 'beton_bertulang', the main material is actually a mix.
+            
+            let baseCost = 0;
+            let wasteCost = 0;
+            
+            // Calculate Auxiliary Materials from Template
+            const auxDetails = template.materials.map(mat => {
+                // If the material in template is same as mainMatKey, we consider it the main one
+                let priceObj = prices[mat.id];
+                // Fallback for dynamic main material (e.g. kayu type)
+                if (mat.id === 'main_material') priceObj = prices[mainMatKey];
+                
+                if (!priceObj) return { name: mat.id, unit: '?', price: 0, coef: 0, total: 0 };
+                
+                const cost = priceObj.price * mat.coef;
+                return { name: priceObj.name, unit: priceObj.unit, price: priceObj.price, coef: mat.coef, total: cost };
             });
 
-            const laborDetails = [
-                { role: 'Tukang', coef: laborCoef, price: tukang.price, total: laborCoef * tukang.price },
-                { role: 'Pekerja', coef: laborCoef * 0.8, price: pekerja.price, total: laborCoef * 0.8 * pekerja.price }, 
-                { role: 'Mandor', coef: laborCoef * 0.05, price: mandor.price, total: laborCoef * 0.05 * mandor.price }
-            ];
-            const laborTotal = laborDetails.reduce((s, x) => s + x.total, 0);
-            const toolCost = laborTotal * 0.05; // Alat 5% dari upah
-            const unitPrice = mainTotal + auxTotal + laborTotal + toolCost;
+            // Special handling: if mainMatKey is NOT in the template materials, add it as main
+            // For Wood: 'rangka_kayu' template doesn't have the wood itself because it varies (Ulin/Meranti)
+            if (!template.materials.find(m => m.id === mainMatKey) && !template.materials.find(m => m.id === 'main_material')) {
+                 // Add the wood/steel itself
+                 // Usually for wood analysis 1m3, need 1.1 m3 material
+                 const mainCoef = 1.1; 
+                 const p = prices[mainMatKey];
+                 auxDetails.unshift({ name: p.name, unit: p.unit, price: p.price, coef: mainCoef, total: p.price * mainCoef });
+            }
+
+            const matTotal = auxDetails.reduce((s, x) => s + x.total, 0);
             
-            items.push({
-                title, vol, unit, unitPrice,
-                totalPrice: vol * unitPrice,
+            // Calculate Labor
+            const laborDetails = [];
+            const l = template.labor;
+            if(l.pekerja) laborDetails.push({ role: 'Pekerja', coef: l.pekerja, price: pekerja.price, total: l.pekerja * pekerja.price });
+            if(l.tukang) laborDetails.push({ role: 'Tukang', coef: l.tukang, price: tukang.price, total: l.tukang * tukang.price });
+            if(l.kepala) laborDetails.push({ role: 'Kepala Tukang', coef: l.kepala, price: kepala.price, total: l.kepala * kepala.price });
+            if(l.mandor) laborDetails.push({ role: 'Mandor', coef: l.mandor, price: mandor.price, total: l.mandor * mandor.price });
+            
+            const laborTotal = laborDetails.reduce((s, x) => s + x.total, 0);
+            const toolCost = laborTotal * 0.05; // 5% Alat
+            
+            const unitPrice = matTotal + laborTotal + toolCost;
+            
+            return {
+                unitPrice,
+                totalPrice: unitPrice * volume,
                 breakdown: {
-                    mainMat: { ...matPrice, coef: mainMatCoef, base: baseCost, waste: wasteCost, subtotal: mainTotal },
+                    // Fake mainMat obj for display consistency with previous logic
+                    mainMat: { name: "Analisa Harga Satuan", coef: 1, price: unitPrice, base: unitPrice, waste: 0, subtotal: unitPrice },
                     auxMat: auxDetails,
                     labor: laborDetails,
                     tool: toolCost
                 }
-            });
+            };
+        };
+
+        const addItem = (title, vol, unit, analysisKey, mainMatKey) => {
+            const data = getAnalysis(analysisKey, vol, mainMatKey);
+            if(data) {
+                items.push({ title, vol, unit, ...data });
+            }
         };
 
         const numCols = g.shape === 'hexagon' ? 6 : (g.shape === 'octagon' ? 8 : 4);
         
         // 1. PONDASI
-        const volPondasi = numCols * 0.15; 
-        addItem("Pondasi Beton Bertulang", volPondasi, "m3", "beton_k250", 1.02, 3.0, [
-            { key: 'bekisting', coef: 20.0 }, // Konversi m3 papan ke kebutuhan bekisting
-            { key: 'paku', coef: 0.4 }
-        ]);
+        const volPondasi = numCols * 0.15; // m3
+        if(matStruct === 'beton_bertulang') {
+            addItem("Pondasi Beton Bertulang (SNI 7394)", volPondasi, "m3", "beton_bertulang", "semen_kg");
+        } else {
+            addItem("Pondasi Umpak (SNI 7394)", volPondasi, "m3", "pondasi_umpak", "semen_kg");
+        }
         
         // 2. STRUKTUR UTAMA
-        const volStructM3 = g.area * 0.08; 
-        
-        if (matStruct.includes('besi') || matStruct.includes('baja')) {
-            const weightCoef = matStruct === 'baja_wf' ? 35 : 12;
-            const totalWeight = g.area * weightCoef;
-            const matKey = matStruct;
-            
-            addItem(`Rangka Struktur (${prices[matKey].name})`, totalWeight, "kg", matKey, 1.05, 0.06, [
-                { key: 'las', coef: 0.05 },
-                { key: 'cat_besi', coef: 0.02 }
-            ]);
-        } else if (matStruct.includes('pipa')) {
-             const totalBtg = Math.ceil(g.area * 2);
-             addItem(`Rangka Pipa Galvanis`, totalBtg, "btg", matStruct, 1.1, 0.8, [
-                 { key: 'las', coef: 0.2 },
-                 { key: 'cat_besi', coef: 0.1 }
-             ]);
+        if (matStruct === 'beton_bertulang') {
+             const volBeton = g.area * 0.15; // m3 estimation
+             addItem("Struktur Beton Bertulang K-225", volBeton, "m3", "beton_bertulang", "semen_kg");
+        } else if (matStruct.includes('kayu') || matStruct.includes('papan')) {
+             const volKayu = g.area * 0.08; // m3
+             addItem(`Rangka Kayu (${prices[matStruct].name})`, volKayu, "m3", "rangka_kayu", matStruct);
         } else {
-            // KAYU
-            addItem(`Rangka Kayu (${prices[matStruct].name})`, volStructM3, "m3", matStruct, 1.1, 15.0, [
-                { key: 'baut', coef: 15 }, 
-                { key: 'paku', coef: 3.0 },
-                { key: 'cat_kayu', coef: 2.5 }
-            ]);
+             // BESI / BAJA (Analisa KG)
+             // Convert volume to weight approx
+             let weight = 0;
+             if(matStruct === 'baja_wf') weight = g.area * 35; // 35kg/m2
+             else weight = g.area * 15; // Hollow/Pipa lighter 15kg/m2
+             
+             addItem(`Rangka Besi/Baja (${prices[matStruct].name})`, weight, "kg", "rangka_besi", matStruct);
         }
         
         // 3. ATAP
-        let roofCoef = 1.1, roofKey = matRoof;
-        if(matRoof === 'genteng_keramik') { 
-            // Konversi bh ke m2 (approx 14 bh/m2 sesuai Kanmuri)
-            prices['genteng_keramik_m2'] = { ...prices['genteng_keramik'], price: prices['genteng_keramik'].price * 14, unit: 'm2 set' }; 
-            roofKey = 'genteng_keramik_m2'; 
-            roofCoef = 1.05; 
-        } else if (matRoof === 'genteng_metal' || matRoof === 'seng_gelombang' || matRoof === 'atap_onduline') {
-            // Konversi lbr ke m2 (approx 1.5 - 2 lbr/m2 tergantung overlap, kita ambil harga per lembar dan koefisien per m2)
-            // Asumsi 1 lembar efektif menutupi 0.8 m2
-            const effectiveArea = matRoof === 'atap_onduline' ? 1.53 : 0.8; // Onduline lbh besar
-            prices[matRoof + '_m2'] = { ...prices[matRoof], price: prices[matRoof].price / effectiveArea, unit: 'm2 set' };
-            roofKey = matRoof + '_m2';
-        }
-
-        addItem("Penutup Atap", g.roofArea, "m2", roofKey, roofCoef, 0.2, [{ key: 'paku', coef: 0.05 }]);
+        if(matRoof === 'genteng_keramik') addItem("Penutup Atap Genteng Keramik", g.roofArea, "m2", "atap_genteng_keramik", matRoof);
+        else if(matRoof === 'seng_gelombang') addItem("Penutup Atap Seng BJLS", g.roofArea, "m2", "atap_seng", matRoof);
+        else addItem("Penutup Atap (Metal/Onduline)", g.roofArea, "m2", "atap_seng", matRoof); // Use Seng analysis as generic sheet metal
         
         // 4. LANTAI
-        let floorKey = matFloor;
-        if(matFloor === 'plester_aci') {
-             addItem("Pekerjaan Lantai (Rabat)", g.area, "m2", floorKey, 1.0, 0.5, []);
-        } else if (matFloor === 'lantai_paving') {
-             // Paving butuh pasir urug
-             addItem("Pekerjaan Paving Block", g.area, "m2", floorKey, 1.05, 0.35, [{ key: 'pasir', coef: 0.1 }]);
-        } else if (matFloor === 'lantai_papan_meranti') {
-             // Lantai kayu butuh paku
-             addItem("Lantai Papan Kayu", g.area, "m2", floorKey, 1.1, 0.6, [{ key: 'paku', coef: 0.2 }, { key: 'cat_kayu', coef: 0.2 }]);
-        } else {
-             // Keramik/Granit
-             addItem("Pekerjaan Lantai", g.area, "m2", floorKey, 1.03, 0.45, [{ key: 'semen', coef: 0.25 }, { key: 'pasir', coef: 0.045 }]);
-        }
+        if(matFloor === 'lantai_papan_meranti') addItem("Lantai Papan Kayu", g.area, "m2", "lantai_kayu", "papan_meranti");
+        else if(matFloor === 'lantai_paving') addItem("Lantai Paving Block", g.area, "m2", "lantai_paving", "paving_block");
+        else if(matFloor === 'lantai_vinyl') addItem("Lantai Vinyl", g.area, "m2", "lantai_vinyl", "lantai_vinyl");
+        else addItem("Lantai Keramik/Granit", g.area, "m2", "lantai_keramik", matFloor);
 
         app.renderOutputs(items, profit, tax);
     },
@@ -771,34 +877,21 @@ const app = {
         items.forEach((item, idx) => {
             subtotal += item.totalPrice;
             const bd = item.breakdown;
-            const mainMatTotalCost = item.vol * bd.mainMat.coef * bd.mainMat.price;
-            let laborTotalCost = bd.labor.reduce((s,x)=>s+x.total,0) * item.vol;
             
             // RAB ROW
-            const matReqString = `
-                <div class="text-[10px] text-gray-400 mt-2 pl-3 border-l border-white/10 space-y-1">
-                    <div class="flex justify-between items-center bg-white/5 p-1 rounded">
-                        <span><b>${bd.mainMat.name}</b> <span class="text-xs text-blue-300">(${item.vol.toFixed(1)} x ${bd.mainMat.coef} koef)</span></span>
-                        <span class="text-gray-300 font-mono">${ui.fmt(mainMatTotalCost)}</span>
-                    </div>
-                    ${bd.auxMat.map(a => `
-                        <div class="flex justify-between text-gray-500 px-1">
-                            <span>${a.name} <span class="text-[9px]">(${(a.coef * item.vol).toFixed(2)} ${a.unit})</span></span>
-                            <span>${ui.fmt(a.coef * item.vol * a.price)}</span>
-                        </div>
-                    `).join('')}
-                    <div class="text-blue-400 font-semibold px-1 pt-1 border-t border-white/5 flex justify-between">
-                        <span>Total Upah Tenaga</span>
-                        <span>${ui.fmt(laborTotalCost)}</span>
-                    </div>
-                </div>`;
-
+            // Summarize cost per item type
+            const matCost = bd.auxMat.reduce((s,x)=>s+x.total,0) * item.vol;
+            const laborCost = bd.labor.reduce((s,x)=>s+x.total,0) * item.vol;
+            
             rabBody.innerHTML += `
             <tr class="align-top hover:bg-white/5 group transition-colors border-b border-white/5 last:border-0">
                 <td class="text-center py-4 text-gray-500 font-bold group-hover:text-blue-400">${idx+1}</td>
                 <td class="py-4 px-4">
                     <span class="font-bold text-gray-200 text-sm block mb-1">${item.title}</span>
-                    ${matReqString}
+                    <div class="text-[10px] text-gray-400 pl-2 border-l border-blue-500/30">
+                       <div>Material: ${ui.fmt(matCost)}</div>
+                       <div>Upah: ${ui.fmt(laborCost)}</div>
+                    </div>
                 </td>
                 <td class="text-center py-4 font-medium text-gray-400">${item.vol.toFixed(2)}</td>
                 <td class="text-center py-4 text-gray-500 text-xs uppercase">${item.unit}</td>
@@ -842,10 +935,7 @@ const app = {
                         <tr class="bg-blue-900/10"><td colspan="5" class="py-1 px-4 font-bold text-blue-400 border-b border-white/5 tracking-wide">A. TENAGA KERJA</td></tr>
                         ${laborRows}
                         <tr class="bg-amber-900/10"><td colspan="5" class="py-1 px-4 font-bold text-amber-400 border-b border-white/5 tracking-wide">B. BAHAN</td></tr>
-                        <tr class="border-b border-white/5"><td class="pl-4 py-2 font-bold text-gray-200 border-r border-white/5">${bd.mainMat.name}</td><td class="text-center py-2 border-r border-white/5 text-gray-400 text-xs">${bd.mainMat.unit}</td><td class="text-center py-2 border-r border-white/5 text-gray-400 font-mono text-xs">${bd.mainMat.coef}</td><td class="text-right py-2 border-r border-white/5 px-3 text-gray-400 font-mono text-xs">${ui.fmt(bd.mainMat.price)}</td><td class="text-right py-2 px-3 font-medium text-gray-200 font-mono text-xs">${ui.fmt(bd.mainMat.base)}</td></tr>
                         ${auxRows}
-                        <tr class="border-b border-white/5 bg-red-900/10"><td class="pl-8 py-2 italic text-gray-400 border-r border-white/5 text-[10px]">Wastage (${document.getElementById('param_wastage').value}%)</td><td class="border-r border-white/5" colspan="3"></td><td class="text-right py-2 px-3 text-gray-400 italic font-mono text-xs">${ui.fmt(bd.mainMat.waste)}</td></tr>
-                        
                         <tr class="bg-purple-900/10"><td colspan="5" class="py-1 px-4 font-bold text-purple-400 border-b border-white/5 tracking-wide">C. PERALATAN</td></tr>
                         <tr class="border-b border-white/5"><td class="pl-4 py-2 text-gray-300 border-r border-white/5">Sewa Alat Bantu (5% Upah)</td><td class="text-center py-2 border-r border-white/5 text-gray-400 text-xs">Ls</td><td class="border-r border-white/5" colspan="2"></td><td class="text-right py-2 px-3 font-medium text-gray-300 font-mono text-xs">${ui.fmt(bd.tool)}</td></tr>
                     </tbody>
